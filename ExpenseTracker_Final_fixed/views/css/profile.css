@@ -1,0 +1,161 @@
+/* Page Title Styling */
+.page-title {
+    font-size: 2.2rem;
+    font-weight: normal;
+    color: #ffffff;
+    margin-bottom: 40px;
+}
+
+/* Profile Container Layout */
+.profile-container {
+    max-width: 600px;
+}
+
+/* Avatar Box & Role Header */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+
+
+.avatar-box {
+    width: 65px;
+    height: 65px;
+    background-color: #121620;
+    border: 1px solid #2d3748;
+    border-radius: 50%;
+    /* Circle shape */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.avatar-box:hover {
+    border-color: #e5c185;
+    transform: scale(1.03);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-name-badge h2 {
+    font-size: 1.4rem;
+    font-weight: normal;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid #718096;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    color: #cbd5e0;
+    text-transform: capitalize;
+}
+
+/* Details Key-Value List */
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 45px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+}
+
+.detail-label {
+    width: 180px;
+    color: #ffffff;
+    font-size: 1.1rem;
+}
+
+.detail-value {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: normal;
+}
+
+/* Action Buttons Matching Figma */
+.profile-actions {
+    display: flex;
+    gap: 20px;
+}
+
+.btn-gold {
+    padding: 10px 24px;
+    background-color: #e5c185;
+    color: #0b0e14;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-gold:hover {
+    background-color: #d4ae6e;
+}
+
+.btn-grey {
+    padding: 10px 24px;
+    background-color: #a0aec0;
+    color: #0b0e14;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-grey:hover {
+    background-color: #cbd5e0;
+}
+
+.inline-input {
+    background-color: #121620;
+    border: 1px solid #2d3748;
+    color: #ffffff;
+    padding: 6px 12px;
+    font-size: 1rem;
+    border-radius: 4px;
+    width: 250px;
+    font-family: inherit;
+}
+
+.inline-input:focus {
+    outline: none;
+    border-color: #e5c185;
+}
+
+button.btn-gold {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.alert-error {
+    background-color: #802020;
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+    border: 1px solid #a03030;
+    max-width: 450px;
+}

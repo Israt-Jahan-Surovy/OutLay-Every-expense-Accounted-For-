@@ -1,0 +1,53 @@
+/* Container for side-by-side view */
+.report-display-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 50px;
+    margin-top: 30px;
+}
+
+/* Restrain chart wrapper width & height */
+.chart-wrapper {
+    width: 280px;
+    height: 280px;
+    position: relative;
+}
+
+/* Placeholder circle when no chart is present */
+.placeholder-circle {
+    width: 100%;
+    height: 100%;
+    background-color: #d9d9d9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    color: #1a1f2c;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Legend typography */
+.legend-wrapper h3 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.category-legend {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-legend li {
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+    margin-bottom: 12px;
+    font-size: 18px;
+    color: #ffffff;
+}

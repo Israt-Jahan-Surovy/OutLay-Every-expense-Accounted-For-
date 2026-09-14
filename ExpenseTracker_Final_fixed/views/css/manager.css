@@ -1,0 +1,14 @@
+/* Manager-only page extras (views/manager/budgets.php and
+   managerDashboard.php link this file). Most manager-page styling lives
+   in style.css (shared layout/tables/cards) or in each page's own inline
+   <style> block, so this file only needs to cover what neither of those
+   provides: the .alert-error banner used on budgets.php (its inline
+   block only defined .alert-success, leaving error messages unstyled). */
+
+.alert-error {
+    background-color: #2c1619;
+    color: #f87171;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
