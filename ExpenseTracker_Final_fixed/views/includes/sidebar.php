@@ -12,11 +12,12 @@ $base_controllers = $project_root . '/controllers';
 <aside class="sidebar">
     <div class="sidebar-top">
         <div class="brand-header">
-            <span class="brand-title">OUTLAY</span><br>
-            <p style= "color: White" >Expense Tracker</p>
-
-            <span class="menu-icon">&#9776;</span>
-        </div>
+    <div class="brand-text">
+        <span class="brand-title">OutLay</span>
+        <span class="brand-tagline">Every Expense, Accounted For</span>
+    </div>
+    <span class="menu-icon">&#9776;</span>
+</div>
 
         <ul class="nav-links">
             <?php if ($user_role === 'admin'): ?>

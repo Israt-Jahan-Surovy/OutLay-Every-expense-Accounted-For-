@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 14, 2026 at 01:06 PM
+-- Generation Time: Sep 15, 2026 at 12:19 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -41,16 +41,8 @@ CREATE TABLE `approvaltable` (
 --
 
 INSERT INTO `approvaltable` (`approval_id`, `approval_date`, `approval_status`, `rejected_reason`, `user_id`, `expense_id`) VALUES
-(1, '2026-09-13', 'Rejected', 'Budget limit exceeded for team lunch', 2, 1),
-(2, '2026-09-13', 'Approved', NULL, 2, 4),
-(3, '2026-09-13', 'Rejected', 'Investor meeting expense exceeds travel policy', 2, 2),
-(4, '2026-09-13', 'Approved', NULL, 2, 3),
-(5, '2026-09-14', 'Approved', NULL, 1, 12),
-(10, '2026-09-14', 'Rejected', 'Over budget', 1, 7),
-(11, '2026-09-14', 'Approved', NULL, 2, 15),
-(12, '2026-09-14', 'Rejected', 'No proper desciption added', 1, 6),
-(13, '2026-09-14', 'Rejected', 'Not accepted', 2, 13),
-(14, '2026-09-14', 'Approved', NULL, 2, 17);
+(17, '2026-09-15', 'Approved', NULL, 11, 20),
+(18, '2026-09-15', 'Approved', NULL, 11, 19);
 
 -- --------------------------------------------------------
 
@@ -73,12 +65,8 @@ CREATE TABLE `budgettable` (
 --
 
 INSERT INTO `budgettable` (`budget_id`, `budget_type`, `budget_month`, `budget_amount`, `assigned_by`, `assigned_to`, `parent_budget_id`) VALUES
-(1, 'Employee', '2026-09-01', 2200.00, 2, 3, NULL),
-(2, 'Manager', '2026-09-01', 12800.00, 1, 2, NULL),
-(3, 'Manager', '2026-09-01', 25000.00, 1, 5, NULL),
-(4, 'Employee', '2026-09-01', 3800.00, 2, 6, NULL),
-(5, 'Employee', '2026-09-01', 200.00, 2, 6, NULL),
-(6, 'Employee', '2026-09-01', 1200.00, 2, 3, NULL);
+(9, 'Manager', '2026-09-01', 20000.00, 11, 13, NULL),
+(10, 'Manager', '2026-09-01', 30000.00, 11, 12, NULL);
 
 -- --------------------------------------------------------
 
@@ -124,21 +112,8 @@ CREATE TABLE `expensetable` (
 --
 
 INSERT INTO `expensetable` (`expense_id`, `expense_title`, `expense_amount`, `expense_date`, `expense_status`, `expense_description`, `user_id`, `category_id`) VALUES
-(1, 'Lunch with team manage', 2000.00, '2026-09-09', 'Rejected', '', 3, 1),
-(2, 'Meeting with investor', 2500.00, '2026-09-10', 'Rejected', 'Have to meet with the investors for meeting', 3, 2),
-(3, 'Travel to meet foreign client', 50000.00, '2026-09-12', 'Approved', 'Meeting with foreign client', 3, 4),
-(4, 'Dinner with team', 1000.00, '2026-09-14', 'Approved', 'Dinner with team after office', 3, 1),
-(5, 'Travel with team', 3000.00, '2026-09-15', 'Pending', 'travel with team for a meeting', 2, 4),
-(6, 'Breakfast with team', 3000.00, '2026-09-15', 'Rejected', 'nzowinw', 2, 1),
-(7, 'bsxbkj', 4589.00, '2026-09-16', 'Rejected', 'swmlkw', 2, 3),
-(8, 'Office supplies needed', 2700.00, '2026-09-18', 'Pending', 'enieijejd', 2, 3),
-(9, 'Lunch Bill', 1000.00, '2026-09-01', 'Approved', 'Team lunch', 1, 1),
-(10, 'Taxi Fare', 2000.00, '2026-08-30', 'Pending', 'Client meet travel', 2, 2),
-(11, 'Team Lunch', 1000.00, '2026-09-01', 'Approved', 'Food expense', 1, 1),
-(12, 'Travel Allowance', 2000.00, '2026-08-30', 'Approved', 'Taxi fare for client meeting', 2, 2),
-(13, 'Client Lunch', 1000.00, '2026-09-01', 'Rejected', 'Lunch with client', 3, 1),
-(15, 'Uber fee', 1200.00, '2026-09-12', 'Approved', 'Meeting with a client for which a transportation fee needed to be paid', 3, 2),
-(17, 'Doctor treatment', 1000.00, '2026-09-13', 'Approved', 'Needed doctor to treat chest ache problem', 6, 5);
+(19, 'lunch with client', 2000.00, '2026-09-13', 'Approved', 'had lunch with a client at ABC restaurant', 12, 1),
+(20, 'Team Outing', 2400.00, '2026-09-14', 'Approved', 'Team outing to XYZ site', 12, 4);
 
 -- --------------------------------------------------------
 
@@ -153,19 +128,18 @@ CREATE TABLE `usertable` (
   `user_email` varchar(150) NOT NULL,
   `user_password` varchar(255) NOT NULL,
   `user_role` enum('Admin','Manager','Employee') NOT NULL,
-  `user_status` enum('Active','Inactive') NOT NULL DEFAULT 'Active'
+  `user_status` enum('Active','Inactive') NOT NULL DEFAULT 'Active',
+  `user_avatar` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `usertable`
 --
 
-INSERT INTO `usertable` (`user_id`, `manager_id`, `user_name`, `user_email`, `user_password`, `user_role`, `user_status`) VALUES
-(1, NULL, 'Admin', 'admin@company.com', '$12ab', 'Admin', 'Active'),
-(2, 1, 'Fatima Rahman', 'manager@company.com', '$2345', 'Manager', 'Active'),
-(3, 2, 'Rahim hasan arko', 'employee1@company.com', '$1234', 'Employee', 'Active'),
-(5, NULL, 'Rifat Haider', 'rifat@company.com', '$12345', 'Manager', 'Active'),
-(6, 2, 'Arni Hasan', 'arni@company.com', '$23900', 'Employee', 'Active');
+INSERT INTO `usertable` (`user_id`, `manager_id`, `user_name`, `user_email`, `user_password`, `user_role`, `user_status`, `user_avatar`) VALUES
+(11, NULL, 'System Admin', 'admin@company.com', '$2y$10$DPoCP9SSgnu//U33lpu3N.2mD0y5V.emcuNPawRgDRdmoZ/fV/IYe', 'Admin', 'Active', NULL),
+(12, NULL, 'Maisha Mahjabin', 'maisha@company.com', '$2y$10$0fl5yp4EcG3IWxw.lWBiU.bi14pHUS0IMFBPFtmdStm7GItYKU0Na', 'Manager', 'Active', NULL),
+(13, NULL, 'Israt Jahan Surovy', 'surovy@company.com', '$2y$10$Wm2OAQPpQ8Ga2ao9Y9m4Ne.QuXFZh0IVdC8RujOwXSLRo8SufibGi', 'Employee', 'Active', NULL);
 
 --
 -- Indexes for dumped tables
@@ -218,31 +192,31 @@ ALTER TABLE `usertable`
 -- AUTO_INCREMENT for table `approvaltable`
 --
 ALTER TABLE `approvaltable`
-  MODIFY `approval_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `approval_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `budgettable`
 --
 ALTER TABLE `budgettable`
-  MODIFY `budget_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `budget_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `categorytable`
 --
 ALTER TABLE `categorytable`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `expensetable`
 --
 ALTER TABLE `expensetable`
-  MODIFY `expense_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `expense_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `usertable`
 --
 ALTER TABLE `usertable`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Constraints for dumped tables

@@ -17,9 +17,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    if (resetPasswordByEmail($email, $new_password)) {
-        header("Location: ../views/login.php?notFoundErr=" . urlencode("Password reset successful. Please login."));
-    } else {
+   if (resetPasswordByEmail($email, $new_password)) {
+    header("Location: ../views/login.php?msg=" . urlencode("Password reset successful. Please login."));}
+    else {
         header("Location: ../views/forgotPassword.php?err=" . urlencode("Email address not found."));
     }
     exit();

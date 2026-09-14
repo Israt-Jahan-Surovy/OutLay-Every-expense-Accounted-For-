@@ -1,46 +1,82 @@
 <?php
-// Handles the profile picture upload from views/profile/profile.php.
-// (This file was missing before, so the "click avatar to upload" feature
-// on the profile page never actually worked - it just 404'd.)
-// Plain procedural PHP - no try-catch, no OOP.
+// Prevent "Session Already Started" warning
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-session_start();
-require_once __DIR__ . '/../models/usersModel.php';
+require_once __DIR__ . '/adminCommon.php';
+require_once __DIR__ . '/../models/usersModel.php'; 
 
+// Verify user is logged in regardless of role
 if (!isset($_SESSION['user_id'])) {
+    adminFlash('error', 'User session expired.');
     header("Location: ../views/login.php");
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
+$userId = $_SESSION['user_id'];
+$userRole = strtolower($_SESSION['user_role'] ?? '');
 
+// Check if form was submitted with a file
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_image'])) {
-
+    
     $file = $_FILES['profile_image'];
 
-    // Only accept real uploads with no upload error.
+    // Validate upload status
     if ($file['error'] === UPLOAD_ERR_OK) {
+        
+        $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $fileExt = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        // 1. Validate File Extension
+        if (in_array($fileExt, $allowedTypes, true)) {
+            
+            // 2. Validate File Size (Max 2MB)
+            if ($file['size'] <= 2 * 1024 * 1024) {
 
-        if (in_array($ext, $allowed, true)) {
+                // Set upload directory path
+                $uploadDir = __DIR__ . '/../uploads/avatars/';
+                
+                // Create directory if it does not exist
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
 
-            $uploadDir = __DIR__ . '/../uploads/avatars/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
+                // Generate unique filename to prevent caching issues & overwrites
+                $newFileName = 'user_' . $userId . '_' . time() . '.' . $fileExt;
+                $targetPath = $uploadDir . $newFileName;
+
+                // Move file from temp folder to target directory
+                if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    
+                    // Update database record
+                    if (function_exists('updateUserProfileImage')) {
+                        updateUserProfileImage($userId, $newFileName);
+                    }
+
+                    // Update session variable for immediate UI rendering
+                    $_SESSION['user_avatar'] = $newFileName;
+
+                    adminFlash('success', 'Profile picture updated successfully!');
+                } else {
+                    adminFlash('error', 'Failed to save uploaded image file.');
+                }
+            } else {
+                adminFlash('error', 'File size exceeds the 2MB limit.');
             }
-
-            // Unique file name so users don't overwrite each other's pictures.
-            $newName = 'user_' . $user_id . '_' . time() . '.' . $ext;
-
-            if (move_uploaded_file($file['tmp_name'], $uploadDir . $newName)) {
-                updateUserProfileImage($user_id, $newName);
-            }
+        } else {
+            adminFlash('error', 'Invalid file type. Only JPG, PNG, GIF, and WEBP images are allowed.');
         }
+    } else {
+        adminFlash('error', 'An error occurred during file upload.');
     }
 }
 
-header("Location: ../views/profile/profile.php");
+// Redirect dynamically based on role/location
+if ($userRole === 'admin') {
+    header("Location: ../views/admin/profile.php");
+} else {
+    header("Location: ../views/profile/profile.php");
+}
 exit();
 ?>

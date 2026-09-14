@@ -54,7 +54,6 @@ $pending_result = getExpensesByUser($manager_id, "All");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard - Expense Tracker</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/manager.css">
     <script src="../js/expense.js"></script>
 </head>
 <body>
