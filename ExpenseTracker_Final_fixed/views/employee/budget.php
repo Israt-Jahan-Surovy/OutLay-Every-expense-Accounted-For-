@@ -48,12 +48,12 @@ require_once '../../controllers/expensecontroller.php';
     <?php include '../includes/sidebar.php'; ?>
 
     <div class="main-content">
-        <!-- 1. View the monthly expense budget assigned by Manager -->
+    
         <h1 class="greeting">Personal Expense Budget Monitoring</h1>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Assigned Monthly Budget (Manager)</div>
+                <div class="stat-label">Assigned Monthly Budget</div>
                 <div class="stat-value"><?php echo number_format($my_budget ?? 0); ?> Tk</div>
             </div>
             <div class="stat-card">
@@ -61,7 +61,7 @@ require_once '../../controllers/expensecontroller.php';
                 <div class="stat-value"><?php echo number_format($spent ?? 0); ?> Tk</div>
             </div>
             
-            <!-- 3. View remaining available budget -->
+   
             <div class="stat-card">
                 <div class="stat-label">Remaining Available Budget</div>
                 <div class="stat-value" style="color: <?php echo (($remaining ?? 0) < 0) ? '#f87171' : '#4ade80'; ?>;">
@@ -70,7 +70,7 @@ require_once '../../controllers/expensecontroller.php';
             </div>
         </div>
 
-        <!-- Progress bar visualization for budget usage -->
+     
         <?php 
             $budget_val = $my_budget ?? 0;
             $spent_val = $spent ?? 0;
@@ -87,7 +87,6 @@ require_once '../../controllers/expensecontroller.php';
             </div>
         </div>
 
-        <!-- 2. Track personal expenses against the assigned budget -->
         <div class="section-header">
             <div class="section-title">Personal Expenses Against Budget</div>
         </div>

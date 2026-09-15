@@ -14,9 +14,7 @@ $user_id   = $_SESSION["user_id"];
 $user_name = $_SESSION["user_name"] ?? "User";
 $user_role = $_SESSION["user_role"] ?? "Employee";
 
-// ==========================================
-// 1. DASHBOARD DATA AGGREGATION
-// ==========================================
+
 $current_month = date("Y-m");
 $budget_data = getUserBudget($user_id, $current_month);
 // Fetch Assigned Budget
@@ -45,9 +43,7 @@ $remaining = $my_budget - $spent;
 $recent_result = getExpensesByUser($user_id, "All");
 
 
-// ==========================================
-// 2. CREATE EXPENSE (POST)
-// ==========================================
+
 if (isset($_POST["add_expense"])) {
     $expense_title       = trim($_POST["expense_title"]);
     $expense_amount      = $_POST["expense_amount"];
@@ -87,9 +83,7 @@ if (isset($_POST["add_expense"])) {
 }
 
 
-// ==========================================
-// 3. UPDATE EXPENSE (POST)
-// ==========================================
+
 if (isset($_POST["update_expense"])) {
     $expense_id          = $_POST["expense_id"];
     $expense_title       = trim($_POST["expense_title"]);
@@ -119,9 +113,6 @@ if (isset($_POST["update_expense"])) {
 }
 
 
-// ==========================================
-// 4. DELETE EXPENSE (GET)
-// ==========================================
 if (isset($_GET["delete"])) {
     $expense_id = $_GET["delete"];
 

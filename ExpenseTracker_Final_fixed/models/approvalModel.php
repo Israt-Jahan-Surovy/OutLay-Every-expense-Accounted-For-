@@ -133,10 +133,7 @@ function getApprovalHistoryForManager($manager_id)
     return null;
 }
 
-/**
- * Fetches full detail for a single expense including categories, 
- * applicant info, and approval history for the view page.
- */
+
 function getExpenseById($expense_id)
 {
     $conn = dbConnection();

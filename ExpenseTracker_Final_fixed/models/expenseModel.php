@@ -440,9 +440,7 @@ function getExpenseByIdAndUser(int $expense_id, int $user_id): ?array {
 
     return $expense;
 }
-/**
- * Delete a pending expense for an employee.
- */
+
 function deleteEmployeeExpense(int $expense_id, int $user_id): bool {
     $conn = dbConnection();
     if (!$conn) return false;

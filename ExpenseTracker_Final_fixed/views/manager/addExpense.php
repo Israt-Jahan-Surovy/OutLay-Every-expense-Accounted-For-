@@ -4,10 +4,11 @@ require_once '../../models/dbConnect.php';
 
 $conn = dbConnection();
 
-if (!$conn) {
-    die("Database connection failed.");
+if (!$conn)
+{
+    echo "Database connection failed: " . mysqli_connect_error();
+    exit();
 }
-
 // Fetch categories from database for dropdown
 $category_query = "SELECT category_id, category_name FROM categorytable ORDER BY category_name ASC";
 $category_result = mysqli_query($conn, $category_query);

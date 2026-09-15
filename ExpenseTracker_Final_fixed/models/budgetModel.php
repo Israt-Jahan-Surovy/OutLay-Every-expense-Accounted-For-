@@ -1,11 +1,7 @@
 <?php
 require_once "dbConnect.php";
 
-/**
- * ==========================================
- * 1. COMMON / SHARED BUDGET FUNCTIONS
- * ==========================================
- */
+
 
 // Retrieve personal budget row assigned to a specific user for a given month
 function getUserBudget($user_id, $month = null)
@@ -65,11 +61,6 @@ function getUserRemainingBudget($user_id, $month)
 }
 
 
-/**
- * ==========================================
- * 2. ADMIN BUDGET FUNCTIONS
- * ==========================================
- */
 
 // Assign or create a budget for a Manager (Admin action)
 function assignManagerBudget($admin_id, $manager_id, $amount, $month)
@@ -264,11 +255,7 @@ function getAllManagerBudgets($month)
 }
 
 
-/**
- * ==========================================
- * 3. MANAGER & TEAM BUDGET FUNCTIONS
- * ==========================================
- */
+
 
 
 // Get team members of a Manager
@@ -351,15 +338,7 @@ function getTeamMemberIds($manager_id)
 }
 
 
-/**
- * ----------------------------------------------------------
- * Get total budget allocated by Admin to a Manager
- *
- * Example:
- * Admin gives Manager = 100,000
- * This function returns = 100,000
- * ----------------------------------------------------------
- */
+
 function getManagerAdminBudget($manager_id, $month)
 {
     $conn = dbConnection();
@@ -402,11 +381,7 @@ function getManagerAdminBudget($manager_id, $month)
 }
 
 
-/**
- * ----------------------------------------------------------
- * Manager personal budget = 30% of Admin allocation
- * ----------------------------------------------------------
- */
+
 function getManagerPersonalBudget($manager_id, $month)
 {
     $admin_budget = getManagerAdminBudget(
@@ -418,11 +393,6 @@ function getManagerPersonalBudget($manager_id, $month)
 }
 
 
-/**
- * ----------------------------------------------------------
- * Team budget = 70% of Admin allocation
- * ----------------------------------------------------------
- */
 function getManagerTeamBudget($manager_id, $month)
 {
     $admin_budget = getManagerAdminBudget(
@@ -434,14 +404,6 @@ function getManagerTeamBudget($manager_id, $month)
 }
 
 
-/**
- * ----------------------------------------------------------
- * Original function kept for compatibility.
- *
- * This returns the TOTAL Admin -> Manager allocation,
- * NOT the 70% team portion.
- * ----------------------------------------------------------
- */
 function getTeamBudgetTotal($manager_id, $month)
 {
     return getManagerAdminBudget(
@@ -451,12 +413,6 @@ function getTeamBudgetTotal($manager_id, $month)
 }
 
 
-/**
- * ----------------------------------------------------------
- * Get total employee budgets already distributed
- * by this Manager.
- * ----------------------------------------------------------
- */
 function getEmployeeBudgetTotal($manager_id, $month)
 {
     $conn = dbConnection();
@@ -499,9 +455,7 @@ function getEmployeeBudgetTotal($manager_id, $month)
 }
 
 
-/**
- * Get total approved amount spent by team members
- */
+
 function getTeamSpentTotal($manager_id, $month)
 {
     $team_ids = getTeamMemberIds($manager_id);
@@ -564,10 +518,6 @@ function getTeamSpentTotal($manager_id, $month)
 }
 
 
-/**
- * Get summary table of each employee's budget,
- * spending, and remaining balance
- */
 function getTeamSpendingTable($manager_id, $month)
 {
     $conn = dbConnection();
@@ -642,10 +592,6 @@ function getTeamSpendingTable($manager_id, $month)
 }
 
 
-/**
- * List employees reporting to Manager
- * who do not have a budget assigned for the month
- */
 function getUnassignedTeamMembers($manager_id, $month)
 {
     $conn = dbConnection();
@@ -702,29 +648,7 @@ function getUnassignedTeamMembers($manager_id, $month)
 }
 
 
-/**
- * ==========================================
- * 4. EMPLOYEE BUDGET ASSIGNMENT
- * ==========================================
- *
- * Manager can distribute only 70% of the
- * Admin -> Manager allocation to employees.
- *
- * Example:
- *
- * Admin -> Manager = 100,000
- *
- * Manager personal = 30,000
- * Team allocation   = 70,000
- *
- * Employee A = 30,000
- * Employee B = 40,000
- *
- * Total = 70,000
- *
- * Any further assignment is rejected.
- * ==========================================
- */
+
 
 function assignEmployeeBudget(
     $manager_id,
@@ -755,12 +679,6 @@ function assignEmployeeBudget(
     $amount = (float)$amount;
 
 
-    /**
-     * --------------------------------------------------
-     * STEP 1:
-     * Find Admin -> Manager parent budget
-     * --------------------------------------------------
-     */
     $parent_sql = "SELECT
                        budget_id,
                        budget_amount
@@ -804,10 +722,7 @@ function assignEmployeeBudget(
     mysqli_stmt_close($parent_stmt);
 
 
-    /**
-     * If Admin has not allocated any budget
-     * to this Manager, stop.
-     */
+  
     if (!$parent) {
 
         mysqli_close($conn);
@@ -823,28 +738,9 @@ function assignEmployeeBudget(
 
     $admin_budget = (float)$parent['budget_amount'];
 
-
-    /**
-     * --------------------------------------------------
-     * STEP 2:
-     * Calculate 70% Team Budget
-     * --------------------------------------------------
-     */
     $team_budget = $admin_budget * 0.70;
 
 
-    /**
-     * --------------------------------------------------
-     * STEP 3:
-     * Find existing employee budget
-     * --------------------------------------------------
-     *
-     * We need to exclude the existing employee's
-     * current budget when calculating the total.
-     *
-     * Otherwise modifying an employee budget would
-     * incorrectly count the old amount + new amount.
-     */
     $existing_sql = "SELECT budget_id, budget_amount
                      FROM budgettable
                      WHERE assigned_to = ?
@@ -886,13 +782,6 @@ function assignEmployeeBudget(
     mysqli_stmt_close($existing_stmt);
 
 
-    /**
-     * --------------------------------------------------
-     * STEP 4:
-     * Calculate current employee allocations
-     * excluding the employee being modified.
-     * --------------------------------------------------
-     */
     $total_sql = "SELECT COALESCE(SUM(budget_amount), 0) AS total
                   FROM budgettable
                   WHERE assigned_by = ?
@@ -936,10 +825,7 @@ function assignEmployeeBudget(
         (float)$total_row['total'];
 
 
-    /**
-     * If employee already has a budget,
-     * remove their old amount from the total.
-     */
+   
     if ($existing) {
 
         $current_employee_allocations -=
@@ -948,13 +834,7 @@ function assignEmployeeBudget(
     }
 
 
-    /**
-     * --------------------------------------------------
-     * STEP 5:
-     * Validate the new employee budget
-     * against the 70% team limit.
-     * --------------------------------------------------
-     */
+   
     $new_total =
         $current_employee_allocations + $amount;
 
@@ -979,18 +859,6 @@ function assignEmployeeBudget(
     }
 
 
-    /**
-     * --------------------------------------------------
-     * STEP 6:
-     * Update existing employee budget
-     * --------------------------------------------------
-     */
-    /**
-     * --------------------------------------------------
-     * STEP 6:
-     * Update existing employee budget
-     * --------------------------------------------------
-     */
     if ($existing) {
 
         $budget_id = $existing['budget_id'];
@@ -1048,12 +916,7 @@ function assignEmployeeBudget(
     }
 
 
-    /**
-     * --------------------------------------------------
-     * STEP 7:
-     * Insert new employee budget
-     * --------------------------------------------------
-     */
+   
     $insert_sql = "INSERT INTO budgettable
                    (
                        budget_type,
@@ -1120,11 +983,6 @@ function assignEmployeeBudget(
 }
 
 
-/**
- * ==========================================
- * 5. MODIFY EMPLOYEE BUDGET
- * ==========================================
- */
 
 function updateEmployeeBudget(
     $budget_id,
@@ -1137,9 +995,7 @@ function updateEmployeeBudget(
         return false;
     }
 
-    /**
-     * First find the employee budget being modified.
-     */
+   
     $find_sql = "SELECT
                      budget_amount,
                      budget_month
@@ -1184,18 +1040,13 @@ function updateEmployeeBudget(
     }
 
 
-    /**
-     * Get month of this employee budget.
-     */
     $month = date(
         'Y-m',
         strtotime($existing['budget_month'])
     );
 
 
-    /**
-     * Find Admin -> Manager budget.
-     */
+  
     $parent_sql = "SELECT budget_amount
                    FROM budgettable
                    WHERE assigned_to = ?
@@ -1239,17 +1090,11 @@ function updateEmployeeBudget(
     }
 
 
-    /**
-     * 70% of Admin allocation is the Team budget.
-     */
     $team_budget =
         (float)$parent['budget_amount'] * 0.70;
 
 
-    /**
-     * Get total employee budgets excluding
-     * the employee being modified.
-     */
+   
     $total_sql = "SELECT COALESCE(SUM(budget_amount), 0) AS total
                   FROM budgettable
                   WHERE assigned_by = ?
@@ -1291,9 +1136,6 @@ function updateEmployeeBudget(
         (float)$total_row['total'];
 
 
-    /**
-     * Check 70% limit.
-     */
     if (($other_allocations + $amount) > $team_budget) {
 
         mysqli_close($conn);
@@ -1302,9 +1144,6 @@ function updateEmployeeBudget(
     }
 
 
-    /**
-     * Update employee budget.
-     */
     $sql = "UPDATE budgettable
             SET budget_amount = ?
             WHERE budget_id = ?
@@ -1340,11 +1179,6 @@ function updateEmployeeBudget(
 }
 
 
-/**
- * ==========================================
- * 6. PENDING EXPENSE FUNCTIONS
- * ==========================================
- */
 
 // Count pending expense requests for a Manager's team
 function countPendingTeamExpenses($manager_id)

@@ -2,22 +2,21 @@
 require_once "dbConnect.php";
 require_once "budgetModel.php";
 
-/**
- * Validates if the proposed allocation exceeds the remaining Manager budget pool.
- */
 function canAllocateEmployeeBudget($manager_id, $employee_id, $proposed_amount, $month, $current_budget_id = 0)
 {
     $conn = dbConnection();
-    if (!$conn) return [false, "Database connection error."];
+   if (!$conn) {
+    echo "Database connection failed: " . mysqli_connect_error();
+    exit();
+}
 
-    // 1. Get total manager budget pool set by Admin
+  
     $manager_total = getTeamBudgetTotal($manager_id, $month);
     if ($manager_total <= 0) {
         mysqli_close($conn);
         return [false, "No active team budget assigned by Admin for this month."];
     }
 
-    // 2. Sum existing allocations to other team members
     $sql = "SELECT COALESCE(SUM(budget_amount), 0) AS total_allocated
             FROM budgettable
             WHERE assigned_by = ? 
@@ -39,7 +38,6 @@ function canAllocateEmployeeBudget($manager_id, $employee_id, $proposed_amount, 
     mysqli_stmt_close($stmt);
     mysqli_close($conn);
 
-    // 3. Evaluate total pool cap
     $projected_total = $existing_allocated + (float)$proposed_amount;
     if ($projected_total > $manager_total) {
         $remaining_pool = max(0, $manager_total - $existing_allocated);

@@ -14,15 +14,9 @@ $user_id   = (int)$_SESSION["user_id"];
 $user_role = strtolower($_SESSION["user_role"] ?? '');
 
 // Set view redirect paths according to user role
-$redirect_url = ($user_role === 'admin') 
-    ? "../views/admin/budgets.php" 
-    : "../views/manager/budgets.php";
+$redirect_url = ($user_role === 'admin') ? "../views/admin/budgets.php" : "../views/manager/budgets.php";
 
-/**
- * ==========================================
- * 1. ASSIGN BUDGET (POST HANDLER)
- * ==========================================
- */
+
 if (isset($_POST['assign_budget'])) {
     $manager_id    = $_SESSION['user_id'];
     $employee_id   = (int)$_POST['employee_id'];
@@ -47,7 +41,7 @@ if (isset($_POST['assign_budget'])) {
         mysqli_close($conn);
     }
 
-    // 2. Assign the employee budget
+    // Assign the employee budget
     $success = assignEmployeeBudget($manager_id, $employee_id, $budget_amount, $budget_month);
 
     if ($success) {
@@ -58,11 +52,7 @@ if (isset($_POST['assign_budget'])) {
     exit();
 }
 
-/**
- * ==========================================
- * 2. UPDATE / EDIT BUDGET (POST HANDLER)
- * ==========================================
- */
+
 if (isset($_POST["update_budget"]) || isset($_POST["update_employee_budget"])) {
     $budget_id = (int)($_POST["budget_id"] ?? 0);
     $amount    = (float)($_POST["budget_amount"] ?? $_POST["amount"] ?? 0);

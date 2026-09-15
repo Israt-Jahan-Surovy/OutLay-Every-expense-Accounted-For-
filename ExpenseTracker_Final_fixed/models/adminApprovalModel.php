@@ -1,6 +1,5 @@
 <?php
-// Data-access layer for Admin approving/rejecting Manager expenses.
-// Plain procedural mysqli - no exceptions, no try-catch.
+
 
 require_once __DIR__ . '/adminBase.php';
 
@@ -19,7 +18,7 @@ function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = ''
 
     mysqli_begin_transaction($conn);
 
-    // 1. Verify expense belongs to a Manager and is currently Pending
+ 
     $check = mysqli_prepare(
         $conn,
         "SELECT e.expense_id FROM expensetable e
@@ -46,7 +45,7 @@ function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = ''
         return [false, 'Only pending Manager expenses can be processed by Admin.'];
     }
 
-    // 2. Update status in expensetable
+
     $update = mysqli_prepare($conn, "UPDATE expensetable SET expense_status = ? WHERE expense_id = ?");
     if (!$update) {
         mysqli_rollback($conn);
@@ -63,7 +62,7 @@ function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = ''
         return [false, 'Could not update the expense.'];
     }
 
-    // 3. Insert or update record in approvaltable
+   
     $reasonVal = $decision === 'Rejected' ? trim($reason) : null;
     $approve = mysqli_prepare(
         $conn,

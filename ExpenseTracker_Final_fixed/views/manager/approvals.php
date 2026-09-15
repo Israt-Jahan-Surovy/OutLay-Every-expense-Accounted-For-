@@ -42,7 +42,8 @@ $expenses = getTeamExpensesWithFilter($manager_id, $from_date, $to_date);
         .btn-view { color: #60a5fa; text-decoration: none; font-weight: 500; }
         .btn-view:hover { text-decoration: underline; }
         
-        .btn-action-approve { padding: 6px 14px; background: #e5c185; border: none; color: #000; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 6px; }
+        .btn-action-approve { padding: 6px 14px; background: #e5c185; border: none; color: #000; 
+        border-radius: 4px;  cursor: pointer; font-weight: bold; margin-right: 6px; }
         .btn-action-reject { padding: 6px 14px; background: #283042; border: none; color: #fff; border-radius: 4px; cursor: pointer; }
 
         /* Modal styling */

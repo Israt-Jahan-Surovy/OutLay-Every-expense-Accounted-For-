@@ -65,7 +65,7 @@ $expenses_result = mysqli_stmt_get_result($stmt);
             font-weight: normal;
         }
 
-        /* Status Filter Tabs */
+    
         .filter-tabs {
             display: flex;
             gap: 15px;
@@ -91,7 +91,6 @@ $expenses_result = mysqli_stmt_get_result($stmt);
             color: #e5c185;
         }
 
-        /* Alert Messages */
         .alert {
             padding: 12px 18px;
             border-radius: 6px;
@@ -154,10 +153,9 @@ $expenses_result = mysqli_stmt_get_result($stmt);
 </head>
 <body>
 
-    <!-- Render Sidebar -->
     <?php include '../includes/sidebar.php'; ?>
 
-    <!-- Main Content Area -->
+
     <div class="main-content">
         
         <div class="page-header">
@@ -172,7 +170,6 @@ $expenses_result = mysqli_stmt_get_result($stmt);
             </div>
         </div>
 
-        <!-- Flash Notifications -->
         <?php if (isset($_SESSION['status_success'])): ?>
             <div class="alert alert-success">
                 <?php 
@@ -191,7 +188,6 @@ $expenses_result = mysqli_stmt_get_result($stmt);
             </div>
         <?php endif; ?>
 
-        <!-- Expenses Table -->
         <table class="expense-table">
             <thead>
                 <tr>

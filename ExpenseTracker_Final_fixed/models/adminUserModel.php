@@ -1,8 +1,5 @@
 <?php
-// Data-access layer for the admin "Users" screen.
-// Provides: adminUsers(), adminUserById(), adminCreateUser(),
-// adminUpdateUser(), adminToggleUser(), adminDeleteUser().
-// Plain procedural mysqli - no exceptions, no OOP.
+
 
 require_once __DIR__ . '/adminBase.php';
 
@@ -113,7 +110,7 @@ function adminEmailExists($email, $excludeId = 0)
 }
 
 // Creates a new Manager/Employee account.
-// Creates a new Manager/Employee account.
+
 function adminCreateUser($name, $email, $password, $role)
 {
     if (adminEmailExists($email)) {
