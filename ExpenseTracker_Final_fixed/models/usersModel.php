@@ -5,37 +5,39 @@ function login($user_email, $user_password)
 {
     $conn = dbConnection();
 
-    if ($conn)
-    {
-        $sql = "SELECT * FROM usertable WHERE user_email=?";
-        $stmt = mysqli_prepare($conn, $sql);
-
-        if (!$stmt) {
-            mysqli_close($conn);
-            return null;
-        }
-
-        mysqli_stmt_bind_param($stmt, "s", $user_email);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-
-        if ($user = mysqli_fetch_assoc($result))
-        {
-            // Reject inactive users immediately
-            if ($user["user_status"] === "Active" && $user_password === $user["user_password"])
-            {
-                mysqli_stmt_close($stmt);
-                mysqli_close($conn);
-                return $user;
-            }
-        }
-        
-        // Clean up connection for all failed attempts (wrong password, inactive, or email not found)
-        mysqli_stmt_close($stmt);
-        mysqli_close($conn);
+    if (!$conn) {
+        return null;
     }
 
-    return null;
+    $sql = "SELECT * FROM usertable WHERE user_email = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if (!$stmt) {
+        mysqli_close($conn);
+        return null;
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $user_email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $authenticated_user = null;
+
+    if ($user = mysqli_fetch_assoc($result)) {
+        // Case-insensitive status check and password verification
+        $is_active = (strtolower($user["user_status"]) === "active");
+        $is_password_valid = password_verify($user_password, $user["user_password"]);
+
+        if ($is_active && $is_password_valid) {
+            $authenticated_user = $user;
+        }
+    }
+
+    // Always clean up resources before returning
+    mysqli_stmt_close($stmt);
+    mysqli_close($conn);
+
+    return $authenticated_user;
 }
 
 function getAllUsers()
@@ -129,13 +131,15 @@ function addUser($user_name, $user_email, $user_password, $user_role)
 
         if (!$stmt) return false;
 
-        // Save plain text password directly
+        // Securely hash password before storing in DB
+        $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
+
         mysqli_stmt_bind_param(
             $stmt,
             "ssss",
             $user_name,
             $user_email,
-            $user_password,
+            $hashed_password,
             $user_role
         );
 
@@ -275,12 +279,14 @@ function changePassword($user_id, $new_password)
 
     if ($conn)
     {
+        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+
         $sql = "UPDATE usertable SET user_password=? WHERE user_id=?";
         $stmt = mysqli_prepare($conn, $sql);
 
         if (!$stmt) return false;
 
-        mysqli_stmt_bind_param($stmt, "si", $new_password, $user_id);
+        mysqli_stmt_bind_param($stmt, "si", $hashed_password, $user_id);
 
         $status = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
@@ -328,7 +334,7 @@ function updateUserProfileImage($user_id, $image_name)
 
     if ($conn)
     {
-        $sql = "UPDATE usertable SET profile_image=? WHERE user_id=?";
+        $sql = "UPDATE usertable SET user_avatar=? WHERE user_id=?";
         $stmt = mysqli_prepare($conn, $sql);
 
         if (!$stmt) return false;
@@ -343,28 +349,29 @@ function updateUserProfileImage($user_id, $image_name)
 
     return false;
 }
+
 function resetPasswordByEmail($email, $new_password)
 {
     $conn = dbConnection();
     if ($conn) {
-        // Verify email exists
         $checkSql = "SELECT user_id FROM usertable WHERE user_email = ?";
         $checkStmt = mysqli_prepare($conn, $checkSql);
         mysqli_stmt_bind_param($checkStmt, "s", $email);
         mysqli_stmt_execute($checkStmt);
         $result = mysqli_stmt_get_result($checkStmt);
-        
+
         if (mysqli_num_rows($result) === 0) {
             mysqli_stmt_close($checkStmt);
             mysqli_close($conn);
-            return false; // Email not found
+            return false;
         }
         mysqli_stmt_close($checkStmt);
 
-        // Update password
+        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+
         $sql = "UPDATE usertable SET user_password = ? WHERE user_email = ?";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ss", $new_password, $email);
+        mysqli_stmt_bind_param($stmt, "ss", $hashed_password, $email);
         $status = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
         mysqli_close($conn);
@@ -372,5 +379,3 @@ function resetPasswordByEmail($email, $new_password)
     }
     return false;
 }
-
-?>

@@ -24,7 +24,13 @@ function adminPageStart(string $title, string $active='dashboard'): void {
 <title><?=ae($title)?> | Expense Tracker</title><link rel="stylesheet" href="../css/admin.css"></head><body>
 <div class="admin-shell">
 <aside class="admin-sidebar" id="adminSidebar">
-    <div class="brand"><span>EXPENSE TRACKER</span><span class="hamburger" aria-hidden="true">&#9776;</span></div>
+    <div class="brand">
+    <div class="brand-text">
+        <span class="brand-title">OutLay</span>
+        <span class="brand-tagline">Every Expense, Accounted For</span>
+    </div>
+    <button class="hamburger" aria-hidden="true">&#9776;</button>
+</div>
     <nav class="admin-nav">
     <?php foreach($items as $key=>$item): ?><a class="nav-item <?=$active===$key?'active':''?>" href="<?=ae($item[0])?>"><?=ae($item[1])?></a><?php endforeach; ?>
     </nav>

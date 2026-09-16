@@ -1,11 +1,7 @@
 <?php
-// Data-access layer for Admin approving/rejecting Manager expenses.
-// Plain procedural mysqli - no exceptions, no try-catch.
 
 require_once __DIR__ . '/adminBase.php';
 
-// Approves or rejects a Manager's expense and records the decision.
-// Returns [true, message] on success or [false, message] on failure.
 function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = '')
 {
     if (!in_array($decision, ['Approved', 'Rejected'], true)) {
@@ -19,7 +15,6 @@ function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = ''
 
     mysqli_begin_transaction($conn);
 
-    // 1. Verify expense belongs to a Manager and is currently Pending
     $check = mysqli_prepare(
         $conn,
         "SELECT e.expense_id FROM expensetable e
@@ -46,7 +41,6 @@ function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = ''
         return [false, 'Only pending Manager expenses can be processed by Admin.'];
     }
 
-    // 2. Update status in expensetable
     $update = mysqli_prepare($conn, "UPDATE expensetable SET expense_status = ? WHERE expense_id = ?");
     if (!$update) {
         mysqli_rollback($conn);
@@ -63,7 +57,6 @@ function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = ''
         return [false, 'Could not update the expense.'];
     }
 
-    // 3. Insert or update record in approvaltable
     $reasonVal = $decision === 'Rejected' ? trim($reason) : null;
     $approve = mysqli_prepare(
         $conn,
@@ -92,8 +85,29 @@ function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = ''
         return [false, 'Could not save the approval record.'];
     }
 
+    // Fetch manager user_id + expense title before committing and closing connection
+    $info = mysqli_prepare($conn, "SELECT user_id, expense_title FROM expensetable WHERE expense_id = ?");
+    if ($info) {
+        mysqli_stmt_bind_param($info, 'i', $expenseId);
+        mysqli_stmt_execute($info);
+        $result = mysqli_stmt_get_result($info);
+        $row = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($info);
+    } else {
+        $row = null;
+    }
+
     mysqli_commit($conn);
-    mysqli_close($conn);
+    mysqli_close($conn); // Connection successfully closed here
+
+    if ($row) {
+        require_once __DIR__ . '/../models/notificationModel.php';
+        $msg = "Your expense '{$row['expense_title']}' was {$decision}.";
+        if ($decision === 'Rejected' && $reason !== '') {
+            $msg .= " Reason: " . $reason;
+        }
+        addNotification((int)$row['user_id'], $msg, 'expenses.php');
+    }
 
     return [
         true,
@@ -102,4 +116,3 @@ function adminDecideManagerExpense($expenseId, $adminId, $decision, $reason = ''
             : 'Manager expense rejected successfully.'
     ];
 }
-?>

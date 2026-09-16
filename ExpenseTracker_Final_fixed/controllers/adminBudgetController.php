@@ -1,9 +1,8 @@
 <?php
-// Controller: handles create, update, and delete actions for Manager and Team budgets.
-// Plain procedural PHP - no try-catch, no OOP.
 
 require_once __DIR__ . '/adminCommon.php';
 require_once __DIR__ . '/../models/adminBudgetModel.php';
+require_once __DIR__ . '/../models/notificationModel.php';
 
 requireAdminRole();
 
@@ -30,6 +29,22 @@ if ($action === 'save') {
         adminFlash('error', 'Please select a valid user, target month, and positive amount.');
     } else {
         list($ok, $msg) = adminSaveBudget($adminId, $targetUserId, $budgetType, $month, $amount, $budgetId, $parentBudgetId);
+        
+        if ($ok) {
+            // Determine target landing page based on recipient role
+            $redirectPath = ($budgetType === 'Manager') ? 'budgets.php' : 'budget.php';
+            $formattedMonth = date('F Y', strtotime($month . '-01'));
+            
+            if ($budgetId > 0) {
+                $notifMsg = "Admin updated your budget allocation to " . number_format($amount, 2) . " Tk for " . $formattedMonth . ".";
+            } else {
+                $notifMsg = "Admin assigned you a budget allocation of " . number_format($amount, 2) . " Tk for " . $formattedMonth . ".";
+            }
+
+            // Dispatch notification to recipient
+            addNotification($targetUserId, $notifMsg, $redirectPath);
+        }
+
         adminFlash($ok ? 'success' : 'error', $msg);
     }
 
@@ -38,7 +53,36 @@ if ($action === 'save') {
     if ($budgetId < 1) {
         adminFlash('error', 'Invalid budget record specified.');
     } else {
+        // Fetch budget details before deleting to inform the user
+        $conn = dbConnection();
+        $targetUserId = 0;
+        $budgetType = 'Manager';
+
+        if ($conn) {
+            // FIXED: Removed non-existent manager_id column from field list
+            $getBudgetSql = "SELECT assigned_to, budget_type FROM budgettable WHERE budget_id = ?";
+            $stmt = mysqli_prepare($conn, $getBudgetSql);
+            if ($stmt) {
+                mysqli_stmt_bind_param($stmt, "i", $budgetId);
+                mysqli_stmt_execute($stmt);
+                $res = mysqli_stmt_get_result($stmt);
+                if ($row = mysqli_fetch_assoc($res)) {
+                    $targetUserId = (int)($row['assigned_to'] ?? 0);
+                    $budgetType   = $row['budget_type'] ?? 'Manager';
+                }
+                mysqli_stmt_close($stmt);
+            }
+            mysqli_close($conn);
+        }
+
         $ok = adminDeleteBudget($budgetId);
+
+        if ($ok && $targetUserId > 0) {
+            $redirectPath = ($budgetType === 'Manager') ? 'budgets.php' : 'budget.php';
+            $notifMsg = "Admin removed one of your assigned budget allocations.";
+            addNotification($targetUserId, $notifMsg, $redirectPath);
+        }
+
         adminFlash(
             $ok ? 'success' : 'error',
             $ok ? 'Budget deleted successfully.' : 'Unable to delete budget.'

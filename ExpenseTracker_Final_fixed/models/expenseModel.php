@@ -1,14 +1,7 @@
 <?php
 require_once "dbConnect.php";
-
-function addExpense(
-    $expense_title,
-    $expense_amount,
-    $expense_date,
-    $expense_description,
-    $user_id,
-    $category_id
-) {
+//add expense
+function addExpense($expense_title,$expense_amount, $expense_date,$expense_description,$user_id,$category_id) {
     $conn = dbConnection();
 
     if ($conn) {
@@ -40,7 +33,7 @@ function addExpense(
 
     return false;
 }
-
+//
 function getExpenseById($expense_id)
 {
     $conn = dbConnection();
@@ -399,7 +392,7 @@ function updateEmployeeExpense(int $expense_id, int $user_id, string $title, int
     $conn = dbConnection();
     if (!$conn) return false;
 
-    // Strict UPDATE: enforce status = 'Pending' at SQL level for extra safety
+    
     $sql = "UPDATE expensetable 
             SET expense_title = ?, category_id = ?, expense_amount = ? 
             WHERE expense_id = ? AND user_id = ? AND expense_status = 'Pending'";
@@ -440,14 +433,13 @@ function getExpenseByIdAndUser(int $expense_id, int $user_id): ?array {
 
     return $expense;
 }
-/**
- * Delete a pending expense for an employee.
- */
+// Delete a pending expense for an employee.
+
 function deleteEmployeeExpense(int $expense_id, int $user_id): bool {
     $conn = dbConnection();
     if (!$conn) return false;
 
-    // Enforce user_id matching and status = 'Pending' at SQL level
+    // Enforce user_id matching and status = 'Pending' 
     $sql = "DELETE FROM expensetable 
             WHERE expense_id = ? AND user_id = ? AND expense_status = 'Pending'";
 

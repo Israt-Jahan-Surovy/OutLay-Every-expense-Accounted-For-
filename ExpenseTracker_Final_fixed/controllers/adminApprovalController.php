@@ -1,7 +1,5 @@
 <?php
-// Controller: handles Admin approve/reject decisions on Manager expenses.
-// Called from views/admin/rejectExpense.php and the approve button on expenses.php
-// Plain procedural PHP - no try-catch, no OOP.
+
 
 require_once __DIR__ . '/adminCommon.php';
 require_once __DIR__ . '/../models/adminApprovalModel.php';

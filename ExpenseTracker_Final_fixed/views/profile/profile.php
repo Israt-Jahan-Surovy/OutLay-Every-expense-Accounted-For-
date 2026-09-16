@@ -25,7 +25,7 @@ $is_editing = isset($_GET['edit']) && $_GET['edit'] === 'true';
                 <form id="avatarForm" action="../../controllers/uploadAvatarController.php" method="POST" enctype="multipart/form-data">
                     <label for="profile_pic_input" class="avatar-box" title="Click to upload profile picture">
                         <?php if (!empty($user['profile_image']) && file_exists("../../uploads/avatars/" . $user['profile_image'])): ?>
-                            <img src="../../uploads/avatars/<?php echo htmlspecialchars($user['profile_image']); ?>" alt="Profile Picture" class="avatar-img">
+                            <img src="../../uploads/avatars/<?php echo htmlspecialchars($user['user_avatar']); ?>" class="avatar-img">
                         <?php else: ?>
                             <span class="camera-icon">📷</span>
                         <?php endif; ?>

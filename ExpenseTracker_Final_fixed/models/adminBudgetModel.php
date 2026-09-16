@@ -1,6 +1,4 @@
 <?php
-// Data-access layer for Admin Budgets (Manager and Team/Employee budgets).
-// Plain procedural mysqli - no exceptions, no OOP.
 
 require_once __DIR__ . '/adminBase.php';
 

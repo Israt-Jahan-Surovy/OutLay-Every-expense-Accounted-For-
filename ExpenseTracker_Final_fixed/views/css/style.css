@@ -12,7 +12,7 @@ body {
     min-height: 100vh;
 }
 
-/* Sidebar Styling - Updated to match Figma layout */
+
 .sidebar {
     width: 260px;
     height: 100vh;
@@ -28,23 +28,44 @@ body {
 }
 
 .brand-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 40px;
+    display: flex ;
+    align-items: flex-start ;
+    justify-content: space-between ;
+    margin-bottom: 30px;
+    width: 100% ;
 }
 
+.brand-text {
+    display: flex ;
+    flex-direction: column ;
+}
+
+/* Yellow, bold, large title */
 .brand-title {
-    color: #e5c185;
-    font-size: 1.1rem;
-    font-weight: bold;
-    letter-spacing: 1px;
+    color: #e5c185 ;
+    font-size: 1.6rem ;
+    font-weight: bold ;
+    line-height: 1.1 ;
+    letter-spacing: 0.5px ;
+    text-transform: none ;
 }
 
+/* Subtitle tagline below title */
+.brand-tagline {
+    color: #a0a8b9 ;
+    font-size: 0.75rem ;
+    margin-top: 4px ;
+    font-weight: normal ;
+    line-height: 1.2 ;
+}
+
+/* Hamburger icon positioned on the right */
 .menu-icon {
-    color: #ffffff;
-    font-size: 1.2rem;
-    cursor: pointer;
+    color: #ffffff ;
+    font-size: 1.3rem ;
+    cursor: pointer ;
+    line-height: 1 ;
+    margin-top: 10px ;
 }
 
 .nav-links {
@@ -61,10 +82,10 @@ body {
     transition: color 0.2s ease;
 }
 
-/* Sidebar Active Gold Highlight */
+
 .nav-links a:hover,
 .nav-links li.active a {
-    color: #e5c185 !important;
+    color: #e5c185;
     font-weight: bold;
 }
 
@@ -86,7 +107,7 @@ body {
     background-color: #d4ae6e;
 }
 
-/* Main Content Area - Shifted right so sidebar doesn't overlap content */
+
 .main-content {
     flex: 1;
     margin-left: 260px;
@@ -100,7 +121,7 @@ body {
     margin-bottom: 30px;
 }
 
-/* Stat Cards */
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -126,7 +147,7 @@ body {
     font-weight: normal;
 }
 
-/* Table Section */
+
 .section-header {
     display: flex;
     justify-content: space-between;

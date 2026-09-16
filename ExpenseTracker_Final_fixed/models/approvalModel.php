@@ -133,46 +133,5 @@ function getApprovalHistoryForManager($manager_id)
     return null;
 }
 
-/**
- * Fetches full detail for a single expense including categories, 
- * applicant info, and approval history for the view page.
- */
-function getExpenseById($expense_id)
-{
-    $conn = dbConnection();
-    if (!$conn) return null;
 
-    $expense_id = (int)$expense_id;
-
-    $sql = "SELECT e.*, 
-                   c.category_name, 
-                   u.user_name, 
-                   a.rejected_reason AS rejection_reason,
-                   a.approval_date,
-                   COALESCE(a.approval_status, 'Pending') AS expense_status,
-                   approver.user_name AS approver_name
-            FROM expensetable e
-            LEFT JOIN categorytable c ON e.category_id = c.category_id
-            LEFT JOIN usertable u ON e.user_id = u.user_id
-            LEFT JOIN approvaltable a ON e.expense_id = a.expense_id
-            LEFT JOIN usertable approver ON a.user_id = approver.user_id
-            WHERE e.expense_id = ?
-            LIMIT 1";
-
-    $stmt = mysqli_prepare($conn, $sql);
-    if (!$stmt) {
-        mysqli_close($conn);
-        return null;
-    }
-
-    mysqli_stmt_bind_param($stmt, "i", $expense_id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $data = mysqli_fetch_assoc($result);
-
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
-
-    return $data;
-}
 ?>

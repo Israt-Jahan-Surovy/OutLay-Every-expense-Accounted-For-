@@ -103,7 +103,7 @@ $approvedByText = trim("$managerName $managerRole");
                     <strong><?= htmlspecialchars($status); ?></strong>
                 </div>
 
-                <!-- SHOW ONLY IF STATUS IS APPROVED -->
+       
                 <?php if ($isApproved): ?>
                     <div class="details-label">Approved by</div>
                     <div class="details-value">
@@ -118,7 +118,7 @@ $approvedByText = trim("$managerName $managerRole");
                     <?php endif; ?>
                 <?php endif; ?>
 
-                <!-- SHOW ONLY IF STATUS IS REJECTED -->
+          
                 <?php if ($isRejected): ?>
                     <div class="details-label">Rejection Reason</div>
                     <div class="details-value rejected-reason">

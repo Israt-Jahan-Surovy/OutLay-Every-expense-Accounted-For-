@@ -7,14 +7,14 @@ $conn = dbConnection();
 if (!$conn) {
     die("Database connection failed.");
 }
+$user_id = $_SESSION['user_id'] ?? null;
 
-// Get user ID safely from session or default
-$user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 4; 
-
-// Determine active filter tab
+if (!$user_id) {
+    header("Location: ../../login.php"); 
+    exit;
+}
 $status_filter = isset($_GET['status']) ? trim($_GET['status']) : 'All';
 
-// Build procedural query joining approvaltable for rejection reasons
 if (in_array($status_filter, ['Pending', 'Approved', 'Rejected'])) {
     $base_query = "
         SELECT e.expense_id, e.expense_date, e.expense_title, c.category_name, e.expense_amount, e.expense_status, a.rejected_reason 

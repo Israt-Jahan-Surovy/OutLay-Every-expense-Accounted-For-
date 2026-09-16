@@ -1,8 +1,9 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once __DIR__ . "/../models/expenseModel.php";
 require_once __DIR__ . "/../models/budgetModel.php";
+require_once __DIR__ . "/../models/notificationModel.php";
 
 // Auth Guard Check
 if (!isset($_SESSION["user_id"])) {
@@ -10,19 +11,16 @@ if (!isset($_SESSION["user_id"])) {
     exit();
 }
 
-$user_id   = $_SESSION["user_id"];
+$user_id   = (int)$_SESSION["user_id"];
 $user_name = $_SESSION["user_name"] ?? "User";
 $user_role = $_SESSION["user_role"] ?? "Employee";
 
-// ==========================================
-// 1. DASHBOARD DATA AGGREGATION
-// ==========================================
 $current_month = date("Y-m");
-$budget_data = getUserBudget($user_id, $current_month);
+
 // Fetch Assigned Budget
 $my_budget = 0.00;
 if (function_exists("getUserBudget")) {
-    $budget_data = getUserBudget($user_id);
+    $budget_data = getUserBudget($user_id, $current_month);
     if ($budget_data && isset($budget_data["budget_amount"])) {
         $my_budget = (float)$budget_data["budget_amount"];
     }
@@ -46,14 +44,14 @@ $recent_result = getExpensesByUser($user_id, "All");
 
 
 // ==========================================
-// 2. CREATE EXPENSE (POST)
+// CREATE EXPENSE (POST)
 // ==========================================
 if (isset($_POST["add_expense"])) {
-    $expense_title       = trim($_POST["expense_title"]);
-    $expense_amount      = $_POST["expense_amount"];
-    $expense_date        = $_POST["expense_date"];
-    $expense_description = trim($_POST["expense_description"]);
-    $category_id         = $_POST["category_id"];
+    $expense_title       = trim($_POST["expense_title"] ?? '');
+    $expense_amount      = $_POST["expense_amount"] ?? 0;
+    $expense_date        = $_POST["expense_date"] ?? '';
+    $expense_description = trim($_POST["expense_description"] ?? '');
+    $category_id         = $_POST["category_id"] ?? 0;
 
     if (
         empty($expense_title) ||
@@ -77,6 +75,19 @@ if (isset($_POST["add_expense"])) {
     );
 
     if ($result) {
+    if (strtolower($user_role) === 'manager') {
+        // Manager's own expense needs Admin approval — notify all Admins
+        $conn = dbConnection();
+        if ($conn) {
+            $admin_res = mysqli_query($conn, "SELECT user_id FROM usertable WHERE user_role = 'Admin'");
+            while ($admin_row = mysqli_fetch_assoc($admin_res)) {
+                $msg = "New expense request '{$expense_title}' (" . number_format($expense_amount, 2) . " Tk) submitted by {$user_name}.";
+                addNotification((int)$admin_row['user_id'], $msg, 'expenses.php');
+            }
+            mysqli_close($conn);
+        }
+    }
+
         header("Location: ../views/employee/expenses.php?success=" .
                urlencode("Expense Added Successfully"));
     } else {
@@ -88,15 +99,15 @@ if (isset($_POST["add_expense"])) {
 
 
 // ==========================================
-// 3. UPDATE EXPENSE (POST)
+// UPDATE EXPENSE (POST)
 // ==========================================
 if (isset($_POST["update_expense"])) {
-    $expense_id          = $_POST["expense_id"];
-    $expense_title       = trim($_POST["expense_title"]);
-    $expense_amount      = $_POST["expense_amount"];
-    $expense_date        = $_POST["expense_date"];
-    $expense_description = trim($_POST["expense_description"]);
-    $category_id         = $_POST["category_id"];
+    $expense_id          = $_POST["expense_id"] ?? 0;
+    $expense_title       = trim($_POST["expense_title"] ?? '');
+    $expense_amount      = $_POST["expense_amount"] ?? 0;
+    $expense_date        = $_POST["expense_date"] ?? '';
+    $expense_description = trim($_POST["expense_description"] ?? '');
+    $category_id         = $_POST["category_id"] ?? 0;
 
     $result = updateExpense(
         $expense_id,
@@ -120,7 +131,7 @@ if (isset($_POST["update_expense"])) {
 
 
 // ==========================================
-// 4. DELETE EXPENSE (GET)
+// DELETE EXPENSE (GET)
 // ==========================================
 if (isset($_GET["delete"])) {
     $expense_id = $_GET["delete"];
@@ -138,34 +149,37 @@ if (isset($_GET["delete"])) {
 }
 
 
+// ==========================================
+// ALTERNATIVE ACTION HANDLERS (POST)
+// ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
-    // Handle Edit/Update Request
+    // Handle Action Update
     if ($action === 'update' || isset($_POST['edit_expense'])) {
-        $user_id = $_SESSION['user_id'] ?? 0;
-        $expense_id = intval($_POST['expense_id'] ?? 0);
-        $title = trim($_POST['expense_title'] ?? '');
+        $expense_id  = intval($_POST['expense_id'] ?? 0);
+        $title       = trim($_POST['expense_title'] ?? '');
         $category_id = intval($_POST['category_id'] ?? 0);
-        $amount = floatval($_POST['expense_amount'] ?? 0);
+        $amount      = floatval($_POST['expense_amount'] ?? 0);
 
-        // Validation: Basic Checks
         if ($expense_id <= 0 || empty($title) || $category_id <= 0 || $amount <= 0) {
             $_SESSION['status_error'] = "Invalid input details provided.";
             header("Location: ../views/employee/editExpense.php?id=" . $expense_id);
             exit();
         }
 
-        // Check ownership and ensure status is still Pending
-        $expense = getExpenseByIdAndUser($expense_id, $user_id);
-        if (!$expense || $expense['expense_status'] !== 'Pending') {
-            $_SESSION['status_error'] = "Unauthorized or non-editable expense.";
-            header("Location: ../views/employee/expenses.php");
-            exit();
+        if (function_exists('getExpenseByIdAndUser')) {
+            $expense = getExpenseByIdAndUser($expense_id, $user_id);
+            if (!$expense || $expense['expense_status'] !== 'Pending') {
+                $_SESSION['status_error'] = "Unauthorized or non-editable expense.";
+                header("Location: ../views/employee/expenses.php");
+                exit();
+            }
         }
 
-        // Perform Database Update
-        $success = updateEmployeeExpense($expense_id, $user_id, $title, $category_id, $amount);
+        $success = function_exists('updateEmployeeExpense') 
+            ? updateEmployeeExpense($expense_id, $user_id, $title, $category_id, $amount)
+            : false;
 
         if ($success) {
             $_SESSION['status_success'] = "Expense updated successfully.";
@@ -176,17 +190,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         exit();
     }
-    
 
-}
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-
-    // Handle Delete Request
+    // Handle Action Delete
     if ($action === 'delete') {
-        $user_id = $_SESSION['user_id'] ?? 0;
         $expense_id = intval($_POST['expense_id'] ?? 0);
 
         if ($expense_id <= 0 || $user_id <= 0) {
@@ -195,16 +201,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Verify expense ownership and check that it is Pending
-        $expense = getExpenseByIdAndUser($expense_id, $user_id);
-        if (!$expense || $expense['expense_status'] !== 'Pending') {
-            $_SESSION['status_error'] = "Unauthorized or expense cannot be deleted once processed.";
-            header("Location: ../views/employee/expenses.php");
-            exit();
+        if (function_exists('getExpenseByIdAndUser')) {
+            $expense = getExpenseByIdAndUser($expense_id, $user_id);
+            if (!$expense || $expense['expense_status'] !== 'Pending') {
+                $_SESSION['status_error'] = "Unauthorized or expense cannot be deleted once processed.";
+                header("Location: ../views/employee/expenses.php");
+                exit();
+            }
         }
 
-        // Execute Database Deletion
-        $success = deleteEmployeeExpense($expense_id, $user_id);
+        $success = function_exists('deleteEmployeeExpense') 
+            ? deleteEmployeeExpense($expense_id, $user_id)
+            : false;
 
         if ($success) {
             $_SESSION['status_success'] = "Expense deleted successfully.";
@@ -215,7 +223,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: ../views/employee/expenses.php");
         exit();
     }
-
-  
 }
 ?>

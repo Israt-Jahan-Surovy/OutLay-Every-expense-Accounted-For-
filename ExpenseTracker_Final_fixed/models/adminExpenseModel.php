@@ -1,6 +1,5 @@
 <?php
-// Data-access layer for the admin "Expenses" screen (system-wide view).
-// Plain procedural mysqli - no exceptions, no OOP.
+
 
 require_once __DIR__ . '/adminBase.php';
 

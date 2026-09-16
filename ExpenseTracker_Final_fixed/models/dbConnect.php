@@ -3,7 +3,7 @@
 $serverName = "localhost";
 $userName = "root";
 $password = "";
-$db = "expense_budget_db";
+$db = "expense";
 
 function dbConnection()
 {

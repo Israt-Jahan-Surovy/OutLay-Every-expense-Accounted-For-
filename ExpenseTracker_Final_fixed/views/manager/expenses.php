@@ -2,7 +2,12 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once '../../models/expenseModel.php';
 
-$user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+$user_id = $_SESSION['user_id'] ?? null;
+
+if (!$user_id) {
+    header("Location: ../../login.php"); 
+    exit;
+}
 $status_filter = isset($_GET['status']) ? $_GET['status'] : 'All';
 
 // Fetch user's own expenses list

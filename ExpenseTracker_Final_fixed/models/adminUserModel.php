@@ -1,8 +1,5 @@
 <?php
-// Data-access layer for the admin "Users" screen.
-// Provides: adminUsers(), adminUserById(), adminCreateUser(),
-// adminUpdateUser(), adminToggleUser(), adminDeleteUser().
-// Plain procedural mysqli - no exceptions, no OOP.
+
 
 require_once __DIR__ . '/adminBase.php';
 
@@ -113,6 +110,7 @@ function adminEmailExists($email, $excludeId = 0)
 }
 
 // Creates a new Manager/Employee account.
+
 function adminCreateUser($name, $email, $password, $role)
 {
     if (adminEmailExists($email)) {
@@ -124,6 +122,9 @@ function adminCreateUser($name, $email, $password, $role)
         return [false, 'Could not connect to the database.'];
     }
 
+    // Securely hash the password before saving
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
     $sql = "INSERT INTO usertable (user_name, user_email, user_password, user_role, user_status)
             VALUES (?, ?, ?, ?, 'Active')";
     $stmt = mysqli_prepare($conn, $sql);
@@ -132,7 +133,8 @@ function adminCreateUser($name, $email, $password, $role)
         return [false, 'Could not create user.'];
     }
 
-    mysqli_stmt_bind_param($stmt, 'ssss', $name, $email, $password, $role);
+    // Bind $hashed_password instead of plain $password
+    mysqli_stmt_bind_param($stmt, 'ssss', $name, $email, $hashed_password, $role);
     $ok = mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
     mysqli_close($conn);

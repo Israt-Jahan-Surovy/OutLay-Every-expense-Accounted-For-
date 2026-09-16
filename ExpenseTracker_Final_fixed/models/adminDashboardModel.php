@@ -52,4 +52,28 @@ function adminRecentExpenses($limit = 5) {
     mysqli_close($conn);
     return $rows;
 }
+function getAdminUnreadNotifications() {
+    $conn = adminDbOrFail();
+    $sql = "SELECT notification_id, message, target_url, created_at 
+            FROM notifications 
+            WHERE is_read = 0 
+            ORDER BY created_at DESC";
+    $result = mysqli_query($conn, $sql);
+    $rows = [];
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $rows[] = $row;
+        }
+    }
+    mysqli_close($conn);
+    return $rows;
+}
+
+function markAdminNotificationsRead() {
+    $conn = adminDbOrFail();
+    $sql = "UPDATE notifications SET is_read = 1 WHERE is_read = 0";
+    $result = mysqli_query($conn, $sql);
+    mysqli_close($conn);
+    return $result;
+}
 ?>
