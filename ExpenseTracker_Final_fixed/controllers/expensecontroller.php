@@ -75,18 +75,25 @@ if (isset($_POST["add_expense"])) {
     );
 
     if ($result) {
-    if (strtolower($user_role) === 'manager') {
-        // Manager's own expense needs Admin approval — notify all Admins
         $conn = dbConnection();
         if ($conn) {
-            $admin_res = mysqli_query($conn, "SELECT user_id FROM usertable WHERE user_role = 'Admin'");
-            while ($admin_row = mysqli_fetch_assoc($admin_res)) {
-                $msg = "New expense request '{$expense_title}' (" . number_format($expense_amount, 2) . " Tk) submitted by {$user_name}.";
-                addNotification((int)$admin_row['user_id'], $msg, 'expenses.php');
+            if (strtolower($user_role) === 'manager') {
+                // Manager's own expense needs Admin approval — notify all Admins
+                $admin_res = mysqli_query($conn, "SELECT user_id FROM usertable WHERE user_role = 'Admin'");
+                while ($admin_row = mysqli_fetch_assoc($admin_res)) {
+                    $msg = "New expense request '{$expense_title}' (" . number_format($expense_amount, 2) . " Tk) submitted by {$user_name}.";
+                    addNotification((int)$admin_row['user_id'], $msg, 'expenses.php');
+                }
+            } else {
+                // Regular Employee expense — notify all Managers & redirect to approvals.php
+                $manager_res = mysqli_query($conn, "SELECT user_id FROM usertable WHERE user_role = 'Manager'");
+                while ($manager_row = mysqli_fetch_assoc($manager_res)) {
+                    $msg = "New expense request '{$expense_title}' (" . number_format($expense_amount, 2) . " Tk) submitted by {$user_name}.";
+                    addNotification((int)$manager_row['user_id'], $msg, 'approvals.php');
+                }
             }
             mysqli_close($conn);
         }
-    }
 
         header("Location: ../views/employee/expenses.php?success=" .
                urlencode("Expense Added Successfully"));

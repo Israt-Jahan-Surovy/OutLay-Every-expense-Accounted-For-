@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION["user_id"]) || ($_SESSION["user_role"] ?? '') !== "manager") {
+if (!isset($_SESSION["user_id"]) ||($_SESSION["user_role"] ?? '') !== "manager") {
     header("Location: ../login.php");
     exit();
 }
@@ -9,8 +9,8 @@ if (!isset($_SESSION["user_id"]) || ($_SESSION["user_role"] ?? '') !== "manager"
 require_once '../../models/expenseModel.php';
 require_once '../../models/budgetModel.php';
 
-$manager_id     = $_SESSION["user_id"];
-$user_name      = $_SESSION["user_name"] ?? "Manager";
+$manager_id     =$_SESSION["user_id"];
+$user_name      =$_SESSION["user_name"] ?? "Manager";
 $current_month  = date("Y-m");
 
 $team_ids       = getTeamMemberIds($manager_id);
@@ -18,31 +18,29 @@ $team_count     = count($team_ids);
 $pending_count  = countPendingTeamExpenses($manager_id);
 
 // Admin's total allocation to the Manager
-$admin_allocated = getManagerAdminBudget($manager_id, $current_month);
+$admin_allocated = getManagerAdminBudget($manager_id,$current_month);
 
 // Manager gets 30%
-$my_allocated = $admin_allocated * 0.30;
+$my_allocated =$admin_allocated * 0.30;
 
 // Team gets 70%
-$team_allocated = $admin_allocated * 0.70;
+$team_allocated =$admin_allocated * 0.70;
 
 // Manager's own approved spending
 $my_spent = (float)getApprovedTotalByUser(
-    $manager_id,
-    $current_month
+    $manager_id,$current_month
 );
 
 // Manager's remaining personal budget
-$my_remaining = $my_allocated - $my_spent;
+$my_remaining = $my_allocated -$my_spent;
 
 // Team's approved employee spending
 $team_spent = (float)getTeamSpentTotal(
-    $manager_id,
-    $current_month
+    $manager_id,$current_month
 );
 
 // Team's remaining budget
-$team_remaining = $team_allocated - $team_spent;
+$team_remaining = $team_allocated -$team_spent;
 
 $pending_result = getExpensesByUser($manager_id, "All");
 ?>
@@ -63,7 +61,6 @@ $pending_result = getExpensesByUser($manager_id, "All");
 
     <div class="main-content">
         
-    
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
             <h1 class="greeting" style="margin: 0;">Welcome, <?php echo htmlspecialchars($user_name); ?>!</h1>
 
@@ -73,7 +70,6 @@ $pending_result = getExpensesByUser($manager_id, "All");
                     <span id="topNotifBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #e74c3c; color: white; font-size: 10px; font-weight: bold; border-radius: 50%; padding: 2px 5px;">0</span>
                 </button>
 
-        
                 <div id="topNotifMenu" style="display: none; position: absolute; right: 0; top: 32px; width: 280px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 12px; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.6);">
                     <strong style="display: block; border-bottom: 1px solid #333; padding-bottom: 6px; margin-bottom: 8px; color: #fff; font-size: 14px;">Notifications</strong>
                     <div id="topNotifList" style="max-height: 200px; overflow-y: auto; font-size: 13px; color: #ccc;">
@@ -166,11 +162,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     list.innerHTML = data.map(item => {
-                        let rawUrl = (item.redirect_url && item.redirect_url.trim() !== '') 
-                            ? item.redirect_url 
-                            : 'budget.php';
-                        
-                        const targetUrl = rawUrl.split('/').pop();
+                        // Hardcode redirect directly to approvals.php
+                        let targetUrl = 'approvals.php';
+                        if (item.message.toLowerCase().includes('budget')) {
+                            targetUrl = 'budgets.php';
+    }
                         const opacity = parseInt(item.is_read) === 1 ? '0.6' : '1';
 
                         return `
