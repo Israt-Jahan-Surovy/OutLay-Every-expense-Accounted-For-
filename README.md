@@ -203,8 +203,8 @@ The project follows an **MVC (Model-View-Controller)** architectural pattern:
    $password   = "";
    $db         = "expense";
    ```
-- ** Before running make sure to start Apache and MySQL from Apache server.**
-5. **Run the Application:** Open your web browser and navigate to:
+5. **Before running make sure to start Apache and MySQL from Apache server.**
+6. **Run the Application:** Open your web browser and navigate to:
 
    ```text
    http://localhost/Outlay-Expense-Tracker/
