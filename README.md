@@ -180,8 +180,6 @@ The project follows an **MVC (Model-View-Controller)** architectural pattern:
 - **Backend:** PHP 8.x (Procedural / MVC approach, MySQLi)
 - **Database:** MySQL / MariaDB
 - **Development Environment:** XAMPP / WampServer, Apache, phpMyAdmin, VS Code
-
----
 ---
 
 ## Installation & Setup
@@ -205,7 +203,7 @@ The project follows an **MVC (Model-View-Controller)** architectural pattern:
    $password   = "";
    $db         = "expense";
    ```
-** Before running make sure to start Apache and MySql from Apache server
+- ** Before running make sure to start Apache and MySQL from Apache server.**
 5. **Run the Application:** Open your web browser and navigate to:
 
    ```text
@@ -217,7 +215,7 @@ The project follows an **MVC (Model-View-Controller)** architectural pattern:
 ##  Academic Project Details
 
 - **Course:** CSC 3215 – Web Technologies
-- **Department:** Computer Science
+- **Department:** Computer Science and Engineering
 - **Institution:** American International University-Bangladesh (AIUB)
 - **Faculty:** Md. Khairul Alam Mazumder
 - **Semester:** Summer 2025–26 
