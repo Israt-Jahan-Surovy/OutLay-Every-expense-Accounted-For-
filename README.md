@@ -125,6 +125,7 @@ Approve                   Reject            Approve                     Reject
    ▼                         ▼                 ▼                           ▼
 Status Updated       Rejection Reason   Status Updated             Rejection Reason
                          Saved                                         Saved
+```
 ---
 ##  System Architecture
 
@@ -152,4 +153,88 @@ The project follows an **MVC (Model-View-Controller)** architectural pattern:
 ┌────────────────────────────────────────────────────────┐
 │                   MySQL DATABASE                       │
 └────────────────────────────────────────────────────────┘
+```
+---
+### MVC Responsibilities
+
+| Component | Responsibility |
+| --- | --- |
+| **View** | Displays the user interface |
+| **Controller** | Handles requests and application flow |
+| **Model** | Handles database operations |
+| **Database** | Stores users, expenses, budgets, approvals, categories, etc. |
+
+---
+## Authentication & Security
+
+- **Session Management:** Enforces role-based route protection across all user sessions.
+- **SQL Injection Prevention:** Uses Prepared SQL Statements (`mysqli_prepare`) for database transactions.
+- **XSS Prevention:** Escapes HTML outputs using `htmlspecialchars()`.
+- **Password Hashing:** Uses `password_hash()` with `PASSWORD_DEFAULT` for secure password storage and `password_verify()` for login validation.
+
+---
+
+##  Technologies Used
+
+- **Frontend:** HTML5, CSS3, JavaScript (ES6 / Fetch API / Chart.js)
+- **Backend:** PHP 8.x (Procedural / MVC approach, MySQLi)
+- **Database:** MySQL / MariaDB
+- **Development Environment:** XAMPP / WampServer, Apache, phpMyAdmin, VS Code
+
+---
+---
+
+## Installation & Setup
+
+1. **Install XAMPP / WampServer:** Start the **Apache** and **MySQL** modules.
+
+2. **Copy Project Directory:** Place the project folder into your web server root:
+   - XAMPP: `xampp/htdocs/Outlay-Expense-Tracker/`
+   - WampServer: `wamp64/www/Outlay-Expense-Tracker/`
+
+3. **Import Database:**
+   - Open **phpMyAdmin** (`http://localhost/phpmyadmin`).
+   - Create a new database named `expense`.
+   - Click **Import** and select the database export file: `database/expense.sql`.
+
+4. **Verify Database Connection:** Open `models/dbConnect.php` and verify your credentials:
+
+   ```php
+   $serverName = "localhost";
+   $userName   = "root";
+   $password   = "";
+   $db         = "expense";
+   ```
+** Before running make sure to start Apache and MySql from Apache server
+5. **Run the Application:** Open your web browser and navigate to:
+
+   ```text
+   http://localhost/Outlay-Expense-Tracker/
+   ```
+
+---
+
+##  Academic Project Details
+
+- **Course:** CSC 3215 – Web Technologies
+- **Department:** Computer Science
+- **Institution:** American International University-Bangladesh (AIUB)
+- **Faculty:** Md. Khairul Alam Mazumder
+- **Semester:** Summer 2025–26 
+
+### Team Members
+
+| # | Name | ID | Role |
+| --- | --- | --- | --- |
+| 1 | **Maisha Mahjabin** | 23-54978-3 | Group Leader |
+| 2 | **Israt Jahan Surovy** | 23-54972-3 | Member |
+| 3 | **H.M. Taiyeb Ahsan Tuhin** | 23-51066-1 | Member |
+| 4 | **Md. Muhaiminul Islam** | 24-56611-1 | Member |
+
+---
+
+##  License & Usage
+
+This software was developed strictly for academic evaluation in the CSC 3215 course at AIUB.
+
 
