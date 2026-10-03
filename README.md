@@ -125,7 +125,7 @@ Approve                   Reject            Approve                     Reject
    ▼                         ▼                 ▼                           ▼
 Status Updated       Rejection Reason   Status Updated             Rejection Reason
                          Saved                                         Saved
-
+---
 ##  System Architecture
 
 The project follows an **MVC (Model-View-Controller)** architectural pattern:
